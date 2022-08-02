@@ -39,13 +39,13 @@ if [ -z "$1" ]
   then
     echo "Installing OpenCV from source"
     if [[ -x "$(command -v apt)" ]]; then
-      sudo apt update && sudo apt install build-essential git
-      sudo apt install cmake ffmpeg libavformat-dev libdc1394-22-dev libgtk2.0-dev \
+       apt update &&  apt install -y build-essential git
+       apt install -y cmake ffmpeg libavformat-dev libdc1394-22-dev libgtk2.0-dev \
                        libjpeg-dev libpng-dev libswscale-dev libtbb2 libtbb-dev \
                        libtiff-dev
     elif [[ -x "$(command -v dnf)" ]]; then
-      sudo dnf update && sudo dnf install cmake gcc gcc-c git
-      sudo dnf install ffmpeg-devel libdc1394-devel gtk2-devel \
+       dnf update &&  dnf install cmake gcc gcc-c git
+       dnf install ffmpeg-devel libdc1394-devel gtk2-devel \
                        libjpeg-turbo-devel libpng-devel tbb-devel \
                        libtiff-devel
     fi
@@ -73,16 +73,16 @@ if [ -z "$1" ]
           -DBUILD_opencv_structured_light=OFF -DBUILD_opencv_surface_matching=OFF \
           -DBUILD_opencv_world=OFF -DBUILD_opencv_xobjdetect=OFF -DBUILD_opencv_xphoto=OFF \
           -DCV_ENABLE_INTRINSICS=ON -DWITH_EIGEN=ON -DWITH_PTHREADS=ON -DWITH_PTHREADS_PF=ON \
-          -DWITH_JPEG=ON -DWITH_PNG=ON -DWITH_TIFF=ON
+          -DWITH_JPEG=ON -DWITH_PNG=ON -DWITH_TIFF=ON -DWITH_FFMPEG=ON
     make -j 16
-    sudo make install
+     make install
     rm -rf /tmp/build_opencv
     echo "OpenCV has been built. You can find the header files and libraries in /usr/local/include/opencv2/ and /usr/local/lib"
 
     # https://github.com/cggos/dip_cvqt/issues/1#issuecomment-284103343
-    sudo touch /etc/ld.so.conf.d/mp_opencv.conf
-    sudo bash -c  "echo /usr/local/lib >> /etc/ld.so.conf.d/mp_opencv.conf"
-    sudo ldconfig -v
+     touch /etc/ld.so.conf.d/mp_opencv.conf
+     bash -c  "echo /usr/local/lib >> /etc/ld.so.conf.d/mp_opencv.conf"
+     ldconfig -v
 fi
 
 # Modify the build file.

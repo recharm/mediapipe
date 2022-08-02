@@ -14,7 +14,6 @@
 
 FROM ubuntu:20.04
 
-MAINTAINER <mediapipe@google.com>
 
 WORKDIR /io
 WORKDIR /mediapipe
@@ -33,12 +32,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         python3-dev \
         python3-opencv \
         python3-pip \
-        libopencv-core-dev \
-        libopencv-highgui-dev \
-        libopencv-imgproc-dev \
-        libopencv-video-dev \
-        libopencv-calib3d-dev \
-        libopencv-features2d-dev \
         software-properties-common && \
     add-apt-repository -y ppa:openjdk-r/ppa && \
     apt-get update && apt-get install -y openjdk-8-jdk && \
@@ -46,6 +39,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     apt-get install -y mesa-utils && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
+# Step 1: Remove installation of these libraries.
+#         They will be installed with setup_opencv.sh
+        # libopencv-core-dev \
+        # libopencv-highgui-dev \
+        # libopencv-imgproc-dev \
+        # libopencv-video-dev \
+        # libopencv-calib3d-dev \
+        # libopencv-features2d-dev \
+
+
 
 RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 100 --slave /usr/bin/g++ g++ /usr/bin/g++-8
 RUN pip3 install --upgrade setuptools
@@ -68,6 +72,9 @@ azel-${BAZEL_VERSION}-installer-linux-x86_64.sh" && \
     rm -f /bazel/installer.sh
 
 COPY . /mediapipe/
+RUN cd /mediapipe && bash setup_opencv.sh
+# Step 2: Run setup_opencv.sh
+
 
 # If we want the docker image to contain the pre-built object_detection_offline_demo binary, do the following
 # RUN bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 mediapipe/examples/desktop/demo:object_detection_tensorflow_demo
