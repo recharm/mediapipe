@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM ubuntu:20.04
+#FROM ubuntu:20.04
+FROM tensorflow/tensorflow:devel-gpu
 
 
 WORKDIR /io
@@ -75,6 +76,16 @@ COPY . /mediapipe/
 RUN cd /mediapipe && bash setup_opencv.sh
 # Step 2: Run setup_opencv.sh
 
+RUN export PATH=/usr/local/cuda-11.2/bin${PATH:+:${PATH}}
+RUN export LD_LIBRARY_PATH=/usr/local/cuda-11.2/targets/x86_64-linux/lib,/usr/local/cuda-11.2/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+RUN ldconfig
+RUN export TF_CUDA_PATHS=/usr/local/cuda-11.2,/usr/local/cuda-11.2/targets/x86_64-linux/lib,/usr/lib/x86_64-linux-gnu,/usr/include,/usr/local/cuda-11.2/targets/x86_64-linux/include,/usr/include/x86_64-linux-gnu/
+
 
 # If we want the docker image to contain the pre-built object_detection_offline_demo binary, do the following
 # RUN bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 mediapipe/examples/desktop/demo:object_detection_tensorflow_demo
+#RUN bazel build -c opt --config=cuda --spawn_strategy=local --define no_aws_support=true --copt -DMESA_EGL_NO_X11_HEADERS mediapipe/examples/desktop/autoflip:run_autoflip
+RUN bazel build -c opt --copt -DMESA_EGL_NO_X11_HEADERS --copt -DEGL_NO_X11 mediapipe/examples/desktop/autoflip:run_autoflip --verbose_failures
+
+
+
